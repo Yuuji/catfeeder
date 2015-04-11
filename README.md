@@ -10,4 +10,4 @@ Cat feeder powered by Raspberry Pi :)
 - sudo apt-get autoremove --purge  
 - Clock sync: sudo apt-get install ntpdate  
 - add "/usr/sbin/ntpdate -b de.pool.ntp.org" to /etc/rc.local
-- We need node.js of course: sudo apt-get install nodejs  
+- We need node.js of course: sudo apt-get install nodejs npm  
