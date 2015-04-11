@@ -1,0 +1,25 @@
+{
+  "name": "Catfeeder",
+  "version": "0.1.0",
+  "description": "Catfeeder powered by Rasberry Pi",
+  "main": "src/run.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yuuji/catfeeder.git"
+  },
+  "keywords": [
+    "Cats",
+    "Catfeeder",
+    "Raspberry",
+    "Pi"
+  ],
+  "author": "Mia Sohie Moeller <m.moeller@bytevision.net>",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/Yuuji/catfeeder/issues"
+  },
+  "homepage": "https://github.com/Yuuji/catfeeder",
+  "dependencies": {
+      "onoff": "*"
+  }
+}
