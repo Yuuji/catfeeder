@@ -60,12 +60,16 @@ motorcontrol.prototype.init = function() {
         },
         check: new Gpio(this.config_.check, 'in')
     };
+    
+    this.reset();
 };
 
 /**
  * Prepare for shutdown
  */
 motorcontrol.prototype.shutdown = function() {
+    this.reset();
+    
     this.hardware_.motor.enable.unexport();
     this.hardware_.motor.a.unexport();
     this.hardware_.motor.b.unexport();
@@ -75,6 +79,19 @@ motorcontrol.prototype.shutdown = function() {
     this.hardware_.vibration.b.unexport();
     
     this.hardware_.check.unexport();
+};
+
+/**
+ * Resets all outputs
+ */
+motorcontrol.prototype.reset = function() {
+    this.hardware_.motor.enable.writeSync(0);
+    this.hardware_.motor.a.writeSync(0);
+    this.hardware_.motor.b.writeSync(0);
+    
+    this.hardware_.vibration.enable.writeSync(0);
+    this.hardware_.vibration.a.writeSync(0);
+    this.hardware_.vibration.b.writeSync(0);
 };
 
 /**
