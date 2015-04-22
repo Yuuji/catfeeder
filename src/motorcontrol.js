@@ -10,16 +10,26 @@ var Gpio = require('onoff').Gpio;
 var motorcontrol = function(config) {
     this.config_ = config || {
         motor: {
-            enable: 25,
-            a: 23,
-            b: 24
+            enable: 25,                     // Enable GPIO port
+            a: 23,                          // A GPIO port
+            b: 24,                          // B GPIO port
+            direction: 1                    // Direction (0: a=1, b=0 / 1: a=0, b=1)
         },
         vibration: {
-            enable: 10,
-            a: 11,
-            b: 9
+            enable: 10,                     // Enable GPIO port
+            a: 11,                          // A GPIO port
+            b: 9,                           // B GPIO port
+            direction: 0                    // Direction (0: a=1, b=0 / 1: a=0, b=1)
         },
-        check: 18
+        check: {
+            port: 18,                       // GPIO port for check
+            lowLevel: true                  // set to true, if level is false on closed status
+        },
+        times: {
+            startVibration: 5,              // start vibration after x seconds
+            stopVibration: 10,              // stop vibration after x seconds after start
+            errorTimeout: (2 * 70)          // error timeout in seconds (default: two complete motor rounds)
+        }
     };
 
 };
@@ -93,8 +103,9 @@ motorcontrol.prototype.reset = function() {
  * Starts motor
  */
 motorcontrol.prototype.startMotor = function() {
-    this.hardware_.motor.a.writeSync(0);
-    this.hardware_.motor.b.writeSync(1);
+    var direction = (this.config_.motor.direction === 1);
+    this.hardware_.motor.a.writeSync(direction ? 0 : 1);
+    this.hardware_.motor.b.writeSync(direction ? 1 : 0);
     this.hardware_.motor.enable.writeSync(1);
 };
 
@@ -111,8 +122,9 @@ motorcontrol.prototype.stopMotor = function() {
  * Starts vibration
  */
 motorcontrol.prototype.startVibration = function() {
-    this.hardware_.vibration.a.writeSync(1);
-    this.hardware_.vibration.b.writeSync(0);
+    var direction = (this.config_.motor.vibration === 1);
+    this.hardware_.vibration.a.writeSync(direction ? 0 : 1);
+    this.hardware_.vibration.b.writeSync(direction ? 1 : 0);
     this.hardware_.vibration.enable.writeSync(1);
 };
 
@@ -161,9 +173,9 @@ motorcontrol.prototype.feed = function() {
         vibrationTimeout = setTimeout((function() {
             clearTimeout(vibrationTimeout);
             this.stopVibration();
-        }).bind(this), 10000);
+        }).bind(this), this.config_.times.stopVibration * 1000);
 
-    }).bind(this), 5000);
+    }).bind(this), this.config_.times.startVibration * 1000);
 
     motorTimeout = setTimeout((function() {
         clearTimeout(motorTimeout);
@@ -173,7 +185,7 @@ motorcontrol.prototype.feed = function() {
         this.stopMotor();
         this.stopVibration();
 
-    }).bind(this), (2 * 70 * 1000));
+    }).bind(this), (this.config_.times.errorTimeout * 1000));
 
     this.startMotor();
 };
