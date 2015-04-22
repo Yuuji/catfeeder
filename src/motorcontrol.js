@@ -21,7 +21,7 @@ var motorcontrol = function(config) {
         },
         check: 18
     };
-    
+
 };
 
 /**
@@ -60,7 +60,7 @@ motorcontrol.prototype.init = function() {
         },
         check: new Gpio(this.config_.check, 'in', 'both')
     };
-    
+
     this.reset();
 };
 
@@ -69,15 +69,15 @@ motorcontrol.prototype.init = function() {
  */
 motorcontrol.prototype.shutdown = function() {
     this.reset();
-    
+
     this.hardware_.motor.enable.unexport();
     this.hardware_.motor.a.unexport();
     this.hardware_.motor.b.unexport();
-    
+
     this.hardware_.vibration.enable.unexport();
     this.hardware_.vibration.a.unexport();
     this.hardware_.vibration.b.unexport();
-    
+
     this.hardware_.check.unexport();
 };
 
@@ -85,17 +85,17 @@ motorcontrol.prototype.shutdown = function() {
  * Resets all outputs
  */
 motorcontrol.prototype.reset = function() {
-	this.stopMotor();
-	this.stopVibration(); 
+    this.stopMotor();
+    this.stopVibration();
 };
 
 /**
  * Starts motor
  */
 motorcontrol.prototype.startMotor = function() {
-	this.hardware_.motor.a.writeSync(0);
-	this.hardware_.motor.b.writeSync(1);
-	this.hardware_.motor.enable.writeSync(1);
+    this.hardware_.motor.a.writeSync(0);
+    this.hardware_.motor.b.writeSync(1);
+    this.hardware_.motor.enable.writeSync(1);
 };
 
 /**
@@ -111,9 +111,9 @@ motorcontrol.prototype.stopMotor = function() {
  * Starts vibration
  */
 motorcontrol.prototype.startVibration = function() {
-	this.hardware_.vibration.a.writeSync(1);
-	this.hardware_.vibration.b.writeSync(0);
-	this.hardware_.vibration.enable.writeSync(1);
+    this.hardware_.vibration.a.writeSync(1);
+    this.hardware_.vibration.b.writeSync(0);
+    this.hardware_.vibration.enable.writeSync(1);
 };
 
 /**
@@ -129,53 +129,53 @@ motorcontrol.prototype.stopVibration = function() {
  * Feed the cat!
  */
 motorcontrol.prototype.feed = function() {
-	var vibrationTimeout;
-	var motorTimeout;
+    var vibrationTimeout;
+    var motorTimeout;
 
-	this.hardware_.check.watch((function (err, value) {
-		if (err) {
-			throw err;
-		}
-		
-		value = !value;
+    this.hardware_.check.watch((function(err, value) {
+        if (err) {
+            throw err;
+        }
 
-		if (value) {
-			console.log('Fertig!');
-			
-			clearTimeout(motorTimeout);
-			clearTimeout(vibrationTimeout);
+        value = !value;
 
-			this.stopMotor();
-			this.stopVibration();
+        if (value) {
+            console.log('Fertig!');
 
-			this.hardware_.check.unwatch();
-		}
-	}).bind(this));
+            clearTimeout(motorTimeout);
+            clearTimeout(vibrationTimeout);
 
-	
+            this.stopMotor();
+            this.stopVibration();
 
-	vibrationTimeout = setTimeout((function() {
-		clearTimeout(vibrationTimeout);
-		this.startVibration();
+            this.hardware_.check.unwatch();
+        }
+    }).bind(this));
 
-		vibrationTimeout = setTimeout((function() {
-			clearTimeout(vibrationTimeout);
-			this.stopVibration();
-		}).bind(this), 10000);
 
-	}).bind(this), 5000);
 
-	motorTimeout = setTimeout((function() {
-		clearTimeout(motorTimeout);
-		clearTimeout(vibrationTimeout);
+    vibrationTimeout = setTimeout((function() {
+        clearTimeout(vibrationTimeout);
+        this.startVibration();
 
-		console.log('Error');
-		this.stopMotor();
-		this.stopVibration();
+        vibrationTimeout = setTimeout((function() {
+            clearTimeout(vibrationTimeout);
+            this.stopVibration();
+        }).bind(this), 10000);
 
-	}).bind(this), (2 * 70 * 1000));
+    }).bind(this), 5000);
 
-	this.startMotor();
+    motorTimeout = setTimeout((function() {
+        clearTimeout(motorTimeout);
+        clearTimeout(vibrationTimeout);
+
+        console.log('Error');
+        this.stopMotor();
+        this.stopVibration();
+
+    }).bind(this), (2 * 70 * 1000));
+
+    this.startMotor();
 };
 
 module.exports = motorcontrol;
