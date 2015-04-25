@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/Yuuji/catfeeder",
   "dependencies": {
-      "onoff": "*"
+    "onoff": "*",
+    "express": "^4.12.3",
+    "body-parser": "^1.12.3"
   }
 }
